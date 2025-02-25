@@ -1,0 +1,35 @@
+name: Python application for Automation Tests
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+permissions:
+  contents: read
+
+env:
+  TAG: qa-tests-${{ github.sha }}
+  REPO: 727646471145.dkr.ecr.eu-north-1.amazonaws.com/hteymur/qa-automation
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    # Check out the repository
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    # Build docker image 
+    - name: Build, tag, and push Docker image
+      run: |
+        docker build -t $REPO:$TAG -f DockerFiles/DockerfileTest .
+    
+    # List Docker images
+    - name: List Docker images
+      run: |
+        docker images
+

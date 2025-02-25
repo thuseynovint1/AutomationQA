@@ -1,17 +1,15 @@
-# Use an official Python runtime as a parent image
 FROM python:3.13
 
-# Set the working directory in the container
+#Working directory in the container
 WORKDIR /app
 
-# Copy the requirements file and install dependencies
-COPY requirements.txt ./
+#Copy main.py and requirements.txt
+COPY ApplicationTests/* ./
+
+#Install depends
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the rest of the application code
-COPY . .
-
-# Expose the port the application runs on (modify as needed)
+# Expose the port for the application
 EXPOSE 4444
 
 # Define the command to run the application (modify as needed)
