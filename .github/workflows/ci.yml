@@ -10,7 +10,8 @@ permissions:
   contents: read
 
 env:
-  TAG: qa-tests-${{ github.sha }}
+  REGION: eu-north-1
+  TAG-TEST: qa-tests-${{ github.sha }}
   REPO: 727646471145.dkr.ecr.eu-north-1.amazonaws.com/hteymur/qa-automation
 
 jobs:
@@ -24,12 +25,25 @@ jobs:
       uses: actions/checkout@v4
 
     # Build docker image 
-    - name: Build, tag, and push Docker image
+    - name: Build docker image
       run: |
-        docker build -t $REPO:$TAG -f DockerFiles/DockerfileTest .
+        docker build -t $REPO:$TAG-TEST -f DockerFiles/DockerfileTest .
     
-    # List Docker images
-    - name: List Docker images
+    # Get AWS creds
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.ACCESS_KEY }}
+        aws-region: ${{ env.REGION }}
+
+    # Login to ECR
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v2
+    
+    # Publish docker image 
+    - name: Publish docker image
       run: |
-        docker images
+        docker build $REPO:$TAG-TEST
 
