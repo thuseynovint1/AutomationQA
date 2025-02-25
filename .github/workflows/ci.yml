@@ -11,7 +11,7 @@ permissions:
 
 env:
   REGION: eu-north-1
-  TAG-TEST: qa-tests-${{ github.sha }}
+  TAG_TEST: qa-tests-${{ github.sha }}
   REPO: 727646471145.dkr.ecr.eu-north-1.amazonaws.com/hteymur/qa-automation
 
 jobs:
@@ -27,7 +27,7 @@ jobs:
     # Build docker image 
     - name: Build docker image
       run: |
-        docker build -t $REPO:$TAG-TEST -f DockerFiles/DockerfileTest .
+        docker build -t $REPO:$TAG_TEST -f DockerFiles/DockerfileTest .
     
     # Get AWS creds
     - name: Configure AWS credentials
@@ -45,5 +45,5 @@ jobs:
     # Publish docker image 
     - name: Publish docker image
       run: |
-        docker build $REPO:$TAG-TEST
+        docker build $REPO:$TAG_TEST
 
