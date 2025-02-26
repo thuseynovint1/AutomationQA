@@ -36,10 +36,10 @@ chromeNode:
   resources:
     requests:
       cpu: "500m"
-      memory: "512Mi"
+      memory: "256Mi"
     limits:
       cpu: "1000m"
-      memory: "256Mi"
+      memory: "512Mi"
   autoscaler:
     enabled: true
     minReplicas: "1"
