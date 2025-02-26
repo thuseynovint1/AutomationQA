@@ -10,18 +10,18 @@ spec:
     apiVersion: apps/v1
     kind: Deployment
     name: {{ include "selenium-grid.fullname" . }}-chrome-node
-  minReplicas: {{ .values.chromeNode.autoscaler.minReplicas }}
-  maxReplicas: {{ .values.chromeNode.autoscaler.maxReplicas }}
+  minReplicas: {{ .Values.chromeNode.autoscaler.minReplicas }}
+  maxReplicas: {{ .Values.chromeNode.autoscaler.maxReplicas }}
   metrics:
     - type: Resource
       resource:
         name: cpu
         target:
           type: Utilization
-          averageUtilization: {{ .values.chromeNode.autoscaler.targetCPUUtilization }}
+          averageUtilization: {{ .Values.chromeNode.autoscaler.targetCPUUtilization }}
     - type: Resource
       resource:
         name: memory
         target:
           type: Utilization
-          averageUtilization: {{ .values.chromeNode.autoscaler.targetMemoryUtilization }}
+          averageUtilization: {{ .Values.chromeNode.autoscaler.targetMemoryUtilization }}

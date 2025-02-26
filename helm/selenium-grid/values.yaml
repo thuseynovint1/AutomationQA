@@ -37,15 +37,15 @@ chromeNode:
       memory: "1024Mi"
   autoscaler:
     enabled: true
-    minReplicas: 1
-    maxReplicas: 2
+    minReplicas: "1"
+    maxReplicas: "2"
     targetCPUUtilization: 90
     targetMemoryUtilization: 90
 
 # Automation Tests configuration
 automation:
   image:
-    repository: your-repo/your-automation-image
+    repository: automation/qa
     tag: latest
     pullPolicy: Always
   resources:
