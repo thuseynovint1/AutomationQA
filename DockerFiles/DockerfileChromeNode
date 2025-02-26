@@ -1,5 +1,5 @@
 # Use the official Chrome Node image
-FROM selenium/node-chrome:97.0-20250202
+FROM selenium/node-chrome
 
 # Set environment variables to connect to the Selenium Hub
 ENV SE_EVENT_BUS_HOST selenium-grid-hub
