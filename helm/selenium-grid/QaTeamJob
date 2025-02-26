@@ -1,0 +1,27 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "selenium-grid.fullname" . }}-automation
+  labels:
+    {{- include "selenium-grid.labels" . | nindent 4 }}
+spec:
+  template:
+    metadata:
+      labels:
+        {{- include "selenium-grid.selectorLabels" . | nindent 8 }}
+        app: selenium-automation
+    spec:
+      containers:
+        - name: selenium-app
+          image: "{{ .Values.automation.image.repository }}:{{ .Values.automation.image.tag }}"
+          imagePullPolicy: {{ .Values.automation.image.pullPolicy }}
+          resources:
+            {{- toYaml .Values.automation.resources | nindent 12 }}
+          volumeMounts:
+            - name: test-results
+              mountPath: {{ .Values.automation.volume.mountPath }}
+      volumes:
+        - name: test-results
+          emptyDir: {}
+      restartPolicy: Never  # Jobs typically use "Never" or "OnFailure"
+  backoffLimit: 4  # Number of retries before marking the Job as failed
