@@ -49,7 +49,7 @@ jobs:
   # This job depends on the verify-app job
   build-publish:
     runs-on: ubuntu-latest
-    name: Build and Push docker images
+    name: Build&dPush&Docker
     needs: verify-app 
 
     steps:
@@ -126,7 +126,7 @@ jobs:
       # Verify Helm chart
       - name: Verify Helm chart
         run: |
-          helm lint ${{ env.HELM_CHART_DIR }}
+          helm lint ${{ env.HELM_CHART_DIR }} -f ${{ env.HELM_CHART_DIR }}/values.yaml
 
       # Install Helm chart
       - name: Install Helm chart
