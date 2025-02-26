@@ -1,0 +1,12 @@
+# Use the official Selenium Hub image
+FROM selenium/hub:4.28.1
+
+# Set environment variables for session management
+ENV SE_GRID_MAX_SESSION=10
+ENV SE_GRID_MAX_SESSION_WAIT_TIMEOUT=30000
+
+# Expose the default Selenium Hub ports
+EXPOSE 4444 4443 4442
+
+# Set the default command to run the Selenium Hub
+CMD ["/opt/bin/entry_point.sh"]

@@ -1,16 +1,16 @@
-FROM python:3.13
+FROM python:3.10-slim
 
-#Working directory in the container
+# Set the working directory
 WORKDIR /app
 
-#Copy main.py and requirements.txt
-COPY ApplicationTests/* ./
+# Copy requirements.txt first to leverage Docker layer caching
+COPY ApplicationTests/requirements.txt .
 
-#Install depends
+# Install dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Expose the port for the application
-EXPOSE 4444
+# Copy the rest of the application code
+COPY ApplicationTests/ .
 
-# Define the command to run the application (modify as needed)
+# Run the application
 CMD ["python", "main.py"]
