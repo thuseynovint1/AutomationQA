@@ -178,6 +178,10 @@ def test_qa_jobs_page(browser):
         logger.error("❌ TEST FAILED: QA Jobs page - %s", e)
         raise
 
-
+if __name__ == "__main__":
+    test_homepage()
+    test_careers_page()
+    test_qa_jobs_page()
+    
 if __name__ == "__main__":
     pytest.main(["-v", "--html=report.html"])
