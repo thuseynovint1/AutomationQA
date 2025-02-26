@@ -1,3 +1,7 @@
+"""
+This module contains automated tests for the Insider website using Selenium and pytest.
+"""
+
 import os
 import logging
 import time
@@ -8,7 +12,6 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support.ui import Select
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.common.exceptions import TimeoutException, NoSuchElementException
 from selenium.webdriver.common.action_chains import ActionChains
 
 # Configure logging
@@ -40,72 +43,72 @@ def take_screenshot(driver, test_name):
     os.makedirs(screenshot_dir, exist_ok=True)
     screenshot_path = os.path.join(screenshot_dir, f"{test_name}.png")
     driver.save_screenshot(screenshot_path)
-    logger.info(f"Screenshot saved: {screenshot_path}")
+    logger.info("Screenshot saved: %s", screenshot_path)
 
 
 @pytest.fixture(scope="function")
-def driver():
+def browser():
     """Fixture to initialize and quit the driver for each test."""
     driver = get_headless_driver()
     yield driver
     driver.quit()
 
 
-def test_homepage(driver):
+def test_homepage(browser):
     """Test if the Insider homepage loads successfully."""
     try:
-        driver.get(BASE_URL)
-        WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.TAG_NAME, "body")))
-        assert "Insider" in driver.title
+        browser.get(BASE_URL)
+        WebDriverWait(browser, 10).until(EC.presence_of_element_located((By.TAG_NAME, "body")))
+        assert "Insider" in browser.title
         logger.info("✅ TEST 1 PASSED: Homepage loaded successfully")
     except Exception as e:
-        take_screenshot(driver, "test_homepage_failure")
-        logger.error(f"❌ TEST 1 FAILED: Homepage - {e}")
+        take_screenshot(browser, "test_homepage_failure")
+        logger.error("❌ TEST 1 FAILED: Homepage - %s", e)
         raise
 
 
-def test_careers_page(driver):
+def test_careers_page(browser):
     """Test navigation to the Careers page and verify sections."""
     try:
-        driver.get(BASE_URL)
+        browser.get(BASE_URL)
 
-        company_menu = WebDriverWait(driver, 15).until(
+        company_menu = WebDriverWait(browser, 15).until(
             EC.element_to_be_clickable((By.LINK_TEXT, "Company"))
         )
         company_menu.click()
 
-        careers_link = WebDriverWait(driver, 15).until(
+        careers_link = WebDriverWait(browser, 15).until(
             EC.element_to_be_clickable((By.LINK_TEXT, "Careers"))
         )
         careers_link.click()
 
-        WebDriverWait(driver, 10).until(EC.url_contains("careers"))
-        assert "careers" in driver.current_url
-        assert WebDriverWait(driver, 10).until(
+        WebDriverWait(browser, 10).until(EC.url_contains("careers"))
+        assert "careers" in browser.current_url
+        assert WebDriverWait(browser, 10).until(
             EC.presence_of_element_located((By.XPATH, "//h3[contains(text(), 'Our Locations')]"))
         )
-        assert WebDriverWait(driver, 10).until(
+        assert WebDriverWait(browser, 10).until(
             EC.presence_of_element_located((By.XPATH, "//a[contains(text(), 'See all teams')]"))
         )
-        assert WebDriverWait(driver, 10).until(
+        assert WebDriverWait(browser, 10).until(
             EC.presence_of_element_located((By.XPATH, "//h2[contains(text(), 'Life at Insider')]"))
         )
 
         logger.info("✅ TEST 2 PASSED: Careers page loaded successfully")
     except Exception as e:
-        take_screenshot(driver, "test_careers_page_failure")
-        logger.error(f"❌ TEST 2 FAILED: Careers page - {e}")
+        take_screenshot(browser, "test_careers_page_failure")
+        logger.error("❌ TEST 2 FAILED: Careers page - %s", e)
         raise
 
 
-def test_qa_jobs_page(driver):
+def test_qa_jobs_page(browser):
     """Test the QA jobs page, including filtering and job details."""
     try:
-        driver.get(f"{BASE_URL}careers/quality-assurance/")
+        browser.get(f"{BASE_URL}careers/quality-assurance/")
 
         # Handle cookie consent banner
         try:
-            accept_button = WebDriverWait(driver, 5).until(
+            accept_button = WebDriverWait(browser, 5).until(
                 EC.element_to_be_clickable((By.XPATH, "//a[contains(text(), 'Accept')]"))
             )
             accept_button.click()
@@ -114,7 +117,7 @@ def test_qa_jobs_page(driver):
             logger.info("ℹ️ No cookie banner found or already dismissed")
 
         # Click "See all QA jobs"
-        see_all_qa_jobs_link = WebDriverWait(driver, 15).until(
+        see_all_qa_jobs_link = WebDriverWait(browser, 15).until(
             EC.element_to_be_clickable(
                 (By.XPATH, "//a[@href='https://useinsider.com/careers/open-positions/?department=qualityassurance']")
             )
@@ -122,12 +125,12 @@ def test_qa_jobs_page(driver):
         see_all_qa_jobs_link.click()
 
         # Verify redirection
-        WebDriverWait(driver, 15).until(EC.url_contains("open-positions"))
-        assert "qualityassurance" in driver.current_url, "❌ Redirection to QA jobs page failed"
+        WebDriverWait(browser, 15).until(EC.url_contains("open-positions"))
+        assert "qualityassurance" in browser.current_url, "❌ Redirection to QA jobs page failed"
 
         # Filter jobs by location
         try:
-            dropdown_element = WebDriverWait(driver, 10).until(
+            dropdown_element = WebDriverWait(browser, 10).until(
                 EC.presence_of_element_located((By.ID, "filter-by-location"))
             )
             select = Select(dropdown_element)
@@ -139,40 +142,40 @@ def test_qa_jobs_page(driver):
             assert selected_option == "Istanbul, Turkiye", "❌ Location filter not applied correctly"
             logger.info("✅ TEST 3 PASSED: Location filter applied successfully")
         except Exception as e:
-            logger.error(f"❌ TEST 3 FAILED: Failed to apply location filter: {e}")
+            logger.error("❌ TEST 3 FAILED: Failed to apply location filter: %s", e)
             raise
 
         # Test "View Role" button
         try:
-            hover_element = driver.find_element(By.XPATH, '//*[@id="jobs-list"]/div[1]/div')
-            actions = ActionChains(driver)
+            hover_element = browser.find_element(By.XPATH, '//*[@id="jobs-list"]/div[1]/div')
+            actions = ActionChains(browser)
             actions.move_to_element(hover_element).perform()
             logger.info("✅ Cursor moved to the element")
 
-            view_role_button = WebDriverWait(driver, 15).until(
+            view_role_button = WebDriverWait(browser, 15).until(
                 EC.element_to_be_clickable(
                     (By.XPATH, "//a[contains(@class, 'btn-navy') and contains(text(), 'View Role')]")
                 )
             )
             view_role_url = view_role_button.get_attribute("href")
-            logger.info(f"ℹ️ View Role button URL: {view_role_url}")
+            logger.info("ℹ️ View Role button URL: %s", view_role_url)
 
-            driver.execute_script(f"window.open('{view_role_url}', '_blank');")
+            browser.execute_script(f"window.open('{view_role_url}', '_blank');")
             logger.info("✅ Opened the View Role URL in a new tab")
 
-            WebDriverWait(driver, 15).until(EC.number_of_windows_to_be(2))
-            driver.switch_to.window(driver.window_handles[1])
+            WebDriverWait(browser, 15).until(EC.number_of_windows_to_be(2))
+            browser.switch_to.window(browser.window_handles[1])
 
-            WebDriverWait(driver, 15).until(EC.url_contains("jobs.lever.co"))
-            assert "jobs.lever.co" in driver.current_url, "❌ View Role button did not open correct URL"
+            WebDriverWait(browser, 15).until(EC.url_contains("jobs.lever.co"))
+            assert "jobs.lever.co" in browser.current_url, "❌ View Role button did not open correct URL"
             logger.info("✅ TEST 4 PASSED: View Role button opened the correct URL")
         except Exception as e:
-            logger.error(f"❌ TEST 4 FAILED: {e}")
+            logger.error("❌ TEST 4 FAILED: %s", e)
             raise
 
     except Exception as e:
-        take_screenshot(driver, "test_qa_jobs_page_failure")
-        logger.error(f"❌ TEST FAILED: QA Jobs page - {e}")
+        take_screenshot(browser, "test_qa_jobs_page_failure")
+        logger.error("❌ TEST FAILED: QA Jobs page - %s", e)
         raise
 
 
