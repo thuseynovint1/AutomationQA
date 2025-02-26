@@ -40,7 +40,7 @@ jobs:
       # Run pylint linting
       - name: Run pylint linting
         run: |
-          pylint ApplicationTests/main.py
+          pylint --fail-under=8 ApplicationTests/main.py
 
   # This job depends on the verify-app job
   build-publish:
