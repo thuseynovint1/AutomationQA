@@ -12,10 +12,11 @@ permissions:
 env:
   REGION: eu-north-1
   TAG_TEST: qa-tests-${{ github.sha }}
-  TAG_SEL_HUB: sellenium-grid-hub-${{ github.sha }}
+  TAG_SEL_HUB: selenium-grid-hub-${{ github.sha }}
   TAG_CHROME_NODE: chrome-node-${{ github.sha }}
-
   REPO: 727646471145.dkr.ecr.eu-north-1.amazonaws.com/hteymur/qa-automation
+  CLUSTER_NAME: QaAutomationEKS 
+  HELM_CHART_DIR: ./helm/selenium-grid 
 
 jobs:
   verify-app:
@@ -52,34 +53,88 @@ jobs:
     needs: verify-app 
 
     steps:
-    # Check out the repository
-    - name: Checkout code
-      uses: actions/checkout@v4
+      # Check out the repository
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    # Build docker image 
-    - name: Build docker image
-      run: |
-        docker build -t $REPO:$TAG_TEST -f DockerFiles/DockerfileTest .
-        docker build -t $REPO:$TAG_SEL_HUB -f DockerFiles/DockerfileSelHub .
-        docker build -t $REPO:$TAG_CHROME_NODE -f DockerFiles/DockerfileChromeNode .
-    
-    # Get AWS creds
-    - name: Configure AWS credentials
-      uses: aws-actions/configure-aws-credentials@v4
-      with:
-        aws-access-key-id: ${{ secrets.ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.ACCESS_KEY }}
-        aws-region: ${{ env.REGION }}
+      # Build docker images
+      - name: Build docker images
+        run: |
+          docker build -t $REPO:$TAG_TEST -f DockerFiles/DockerfileTest .
+          docker build -t $REPO:$TAG_SEL_HUB -f DockerFiles/DockerfileSelHub .
+          docker build -t $REPO:$TAG_CHROME_NODE -f DockerFiles/DockerfileChromeNode .
 
-    # Login to ECR
-    - name: Login to Amazon ECR
-      id: login-ecr
-      uses: aws-actions/amazon-ecr-login@v2
-    
-    # Publish docker image 
-    - name: Publish docker image
-      run: |
-        docker push $REPO:$TAG_TEST
-        docker push $REPO:$TAG_SEL_HUB
-        docker push $REPO:$TAG_CHROME_NODE
+      # Get AWS credentials
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.ACCESS_KEY }}
+          aws-region: ${{ env.REGION }}
 
+      # Login to ECR
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      # Publish docker images
+      - name: Publish docker images
+        run: |
+          docker push $REPO:$TAG_TEST
+          docker push $REPO:$TAG_SEL_HUB
+          docker push $REPO:$TAG_CHROME_NODE
+
+  # Verify Helm chart and install on EKS
+  deploy-helm:
+    runs-on: ubuntu-latest
+    name: Verify and Deploy Helm Chart
+    needs: build-publish  # Depends on the build-publish job
+
+    steps:
+      # Check out the repository
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Install kubectl
+      - name: Install kubectl
+        run: |
+          curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+          sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+          kubectl version --client
+
+      # Install Helm
+      - name: Install Helm
+        run: |
+          curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
+          chmod 700 get_helm.sh
+          ./get_helm.sh
+          helm version
+
+      # Configure AWS credentials
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.ACCESS_KEY }}
+          aws-region: ${{ env.REGION }}
+
+      # Update kubeconfig for EKS
+      - name: Update kubeconfig
+        run: |
+          aws eks update-kubeconfig --region ${{ env.REGION }} --name ${{ env.CLUSTER_NAME }}
+
+      # Verify Helm chart
+      - name: Verify Helm chart
+        run: |
+          helm lint ${{ env.HELM_CHART_DIR }}
+
+      # Install Helm chart
+      - name: Install Helm chart
+        run: |
+          helm upgrade --install selenium-grid ${{ env.HELM_CHART_DIR }} \
+            --set hub.image.repository=$REPO \
+            --set hub.image.tag=$TAG_SEL_HUB \
+            --set chromeNode.image.repository=$REPO \
+            --set chromeNode.image.tag=$TAG_CHROME_NODE \
+            --set automation.image.repository=$REPO \
+            --set automation.image.tag=$TAG_TEST
