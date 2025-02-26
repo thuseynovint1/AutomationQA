@@ -2,7 +2,7 @@
 FROM selenium/node-chrome:4.28.1
 
 # Set environment variables to connect to the Selenium Hub
-ENV SE_EVENT_BUS_HOST selenium-grid-hub
+ENV SE_EVENT_BUS_HOST selenium-hub
 ENV SE_EVENT_BUS_PUBLISH_PORT 4442
 ENV SE_EVENT_BUS_SUBSCRIBE_PORT 4443
 
