@@ -19,7 +19,7 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(
 logger = logging.getLogger(__name__)
 
 # Configuration
-SELENIUM_GRID_URL = os.getenv("SELENIUM_GRID_URL", "http://selenium-grid-hub:4444/wd/hub")
+SELENIUM_GRID_URL = os.getenv("SELENIUM_GRID_URL", "http://selenium-grid:4444/wd/hub")
 BASE_URL = "https://useinsider.com/"
 
 
