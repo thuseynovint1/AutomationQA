@@ -126,13 +126,13 @@ jobs:
       # Verify Helm chart
       - name: Verify Helm chart
         run: |
-          helm lint helm/selenium-grid -f helm/selenium-grid/Values.yaml
+          helm lint ${{ env.HELM_CHART_DIR }} -f ${{ env.HELM_CHART_DIR }}/Values.yaml
 
       # Install Helm chart
       - name: Install Helm chart
         run: |
           helm upgrade --install selenium-grid ${{ env.HELM_CHART_DIR }} \
-            -f ${{ env.HELM_CHART_DIR }}/Values.yaml
+            -f ./${{ env.HELM_CHART_DIR }}/Values.yaml
             --set hub.image.repository=$REPO \
             --set hub.image.tag=$TAG_SEL_HUB \
             --set chromeNode.image.repository=$REPO \
