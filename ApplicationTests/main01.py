@@ -21,7 +21,7 @@ def setup_browser():
     chrome_options.add_argument("--disable-dev-shm-usage")  # Disable shared memory usage
     chrome_options.add_argument("--window-size=1920,1080")  # Set window size to HD
 
-    hub_url = "http://localhost:51231/wd/hub"  # Selenium Grid Hub URL
+    hub_url = "http://selenium-grid-hub:4444/wd/hub"  # Selenium Grid Hub URL
     try:
         browser = webdriver.Remote(command_executor=hub_url, options=chrome_options)
         logging.info("🚀 Browser initialized successfully.")
