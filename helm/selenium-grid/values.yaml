@@ -8,8 +8,10 @@ hub:
     tag: 4.28.1
     pullPolicy: Always
   env:
-    SE_GRID_TIMEOUT: "300000"
-    SE_SESSION_REQUEST_TIMEOUT: "300000"
+    - SE_GRID_TIMEOUT: 
+      value: "300000"
+    - SE_SESSION_REQUEST_TIMEOUT: 
+      value: "300000"
   resources:
     requests:
       cpu: "500m"
@@ -25,9 +27,12 @@ chromeNode:
     tag: 4.28.1
     pullPolicy: Always
   env:
-    SE_EVENT_BUS_HOST: "selenium-hub"
-    SE_EVENT_BUS_PUBLISH_PORT: "4442"
-    SE_EVENT_BUS_SUBSCRIBE_PORT: "4443"
+    - SE_EVENT_BUS_HOST: 
+      value: "selenium-hub"
+    - SE_EVENT_BUS_PUBLISH_PORT: 
+      value: "4442"
+    - SE_EVENT_BUS_SUBSCRIBE_PORT: 
+      value: "4443"
   resources:
     requests:
       cpu: "500m"
