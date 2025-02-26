@@ -1,0 +1,63 @@
+# Selenium Hub Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "selenium-grid.fullname" . }}-hub
+  labels:
+    {{- include "selenium-grid.labels" . | nindent 4 }}
+spec:
+  selector:
+    {{- include "selenium-grid.selectorLabels" . | nindent 4 }}
+    app: selenium-hub
+  ports:
+    - name: hub-ui
+      protocol: TCP
+      port: 4444
+      targetPort: 4444
+    - name: event-bus-publish
+      protocol: TCP
+      port: 4442
+      targetPort: 4442
+    - name: event-bus-subscribe
+      protocol: TCP
+      port: 4443
+      targetPort: 4443
+  type: ClusterIP
+
+---
+
+# Chrome Node Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "selenium-grid.fullname" . }}-chrome-node
+  labels:
+    {{- include "selenium-grid.labels" . | nindent 4 }}
+spec:
+  selector:
+    {{- include "selenium-grid.selectorLabels" . | nindent 4 }}
+    app: selenium-node-chrome
+  ports:
+    - protocol: TCP
+      port: 5555
+      targetPort: 5555
+  type: ClusterIP
+
+---
+
+# Automation Tests Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "selenium-grid.fullname" . }}-automation
+  labels:
+    {{- include "selenium-grid.labels" . | nindent 4 }}
+spec:
+  selector:
+    {{- include "selenium-grid.selectorLabels" . | nindent 4 }}
+    app: selenium-automation
+  ports:
+    - protocol: TCP
+      port: 4444
+      targetPort: 4444
+  type: ClusterIP

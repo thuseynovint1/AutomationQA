@@ -1,0 +1,100 @@
+# Selenium Hub Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "selenium-grid.fullname" . }}-hub
+  labels:
+    {{- include "selenium-grid.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicas }}
+  selector:
+    matchLabels:
+      {{- include "selenium-grid.selectorLabels" . | nindent 6 }}
+      app: selenium-hub
+  template:
+    metadata:
+      labels:
+        {{- include "selenium-grid.selectorLabels" . | nindent 8 }}
+        app: selenium-hub
+    spec:
+      containers:
+        - name: selenium-hub
+          image: "{{ .Values.hub.image.repository }}:{{ .Values.hub.image.tag }}"
+          imagePullPolicy: {{ .Values.hub.image.pullPolicy }}
+          env:
+            {{- toYaml .Values.hub.env | nindent 12 }}
+          ports:
+            - name: hub-ui
+              containerPort: 4444
+            - name: bus-publish
+              containerPort: 4442
+            - name: bus-subs
+              containerPort: 4443
+          resources:
+            {{- toYaml .Values.hub.resources | nindent 12 }}
+
+---
+
+# Chrome Node Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "selenium-grid.fullname" . }}-chrome-node
+  labels:
+    {{- include "selenium-grid.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicas }}
+  selector:
+    matchLabels:
+      {{- include "selenium-grid.selectorLabels" . | nindent 6 }}
+      app: selenium-node-chrome
+  template:
+    metadata:
+      labels:
+        {{- include "selenium-grid.selectorLabels" . | nindent 8 }}
+        app: selenium-node-chrome
+    spec:
+      containers:
+        - name: selenium-node-chrome
+          image: "{{ .Values.chromeNode.image.repository }}:{{ .Values.chromeNode.image.tag }}"
+          imagePullPolicy: {{ .Values.chromeNode.image.pullPolicy }}
+          env:
+            {{- toYaml .Values.chromeNode.env | nindent 12 }}
+          ports:
+            - containerPort: 5555
+          resources:
+            {{- toYaml .Values.chromeNode.resources | nindent 12 }}
+
+---
+
+# Automation Tests Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "selenium-grid.fullname" . }}-automation
+  labels:
+    {{- include "selenium-grid.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicas }}
+  selector:
+    matchLabels:
+      {{- include "selenium-grid.selectorLabels" . | nindent 6 }}
+      app: selenium-automation
+  template:
+    metadata:
+      labels:
+        {{- include "selenium-grid.selectorLabels" . | nindent 8 }}
+        app: selenium-automation
+    spec:
+      containers:
+        - name: selenium-app
+          image: "{{ .Values.automation.image.repository }}:{{ .Values.automation.image.tag }}"
+          imagePullPolicy: {{ .Values.automation.image.pullPolicy }}
+          resources:
+            {{- toYaml .Values.automation.resources | nindent 12 }}
+          volumeMounts:
+            - name: test-results
+              mountPath: {{ .Values.automation.volume.mountPath }}
+      volumes:
+        - name: test-results
+          emptyDir: {}
