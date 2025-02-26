@@ -126,6 +126,8 @@ jobs:
       # Verify Helm chart
       - name: Verify Helm chart
         run: |
+          ls -la /helm
+          cd /helm/selenium-grid
           ls -la
           pwd  
           helm lint /helm/selenium-grid -f /helm/selenium-grid/Values.yaml
