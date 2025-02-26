@@ -16,7 +16,7 @@ env:
   TAG_CHROME_NODE: chrome-node-${{ github.sha }}
   REPO: 727646471145.dkr.ecr.eu-north-1.amazonaws.com/hteymur/qa-automation
   CLUSTER_NAME: QaAutomationEKS 
-  HELM_CHART_DIR: ./helm/selenium-grid 
+  HELM_CHART_DIR: helm/selenium-grid 
 
 jobs:
   verify-app:
@@ -76,7 +76,7 @@ jobs:
       - name: Login to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
-
+ 
       # Publish docker images
       - name: Publish docker images
         run: |
