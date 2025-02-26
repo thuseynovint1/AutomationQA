@@ -15,9 +15,37 @@ env:
   REPO: 727646471145.dkr.ecr.eu-north-1.amazonaws.com/hteymur/qa-automation
 
 jobs:
-  build:
-
+  verify-app:
+    name: Verify Application
     runs-on: ubuntu-latest
+
+    steps:
+      # Check out the repository
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Set up Python
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'  # Use the Python version required by your project
+
+      # Install dependencies
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pylint
+
+      # Run pylint linting
+      - name: Run pylint linting
+        run: |
+          pylint ApplicationTests/main.py
+
+  # This job depends on the verify-app job
+  build-publish:
+    runs-on: ubuntu-latest
+    name: Build and Push docker images
+    needs: verify-app 
 
     steps:
     # Check out the repository
