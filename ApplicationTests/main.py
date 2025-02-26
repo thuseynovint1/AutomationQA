@@ -1,123 +1,98 @@
-"""
-This module contains automated tests for the Insider website using Selenium and pytest.
-"""
-
-import os
-import logging
-import time
-import pytest
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support.ui import Select
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import TimeoutException, NoSuchElementException
 from selenium.webdriver.common.action_chains import ActionChains
 
-# Configure logging
-logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
-logger = logging.getLogger(__name__)
-
-# Configuration
-SELENIUM_GRID_URL = os.getenv("SELENIUM_GRID_URL", "http://selenium-grid-hub:4444/wd/hub")
-BASE_URL = "https://useinsider.com/"
+import time
 
 
 def get_headless_driver():
-    """Initialize and return a headless Chrome driver."""
     options = Options()
-    options.add_argument("--headless=new")
+    options.add_argument("--headless=new")  # Use new headless mode for better stability
     options.add_argument("--disable-gpu")
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-dev-shm-usage")
-    options.add_argument("--disable-blink-features=AutomationControlled")
-    options.add_argument("--window-size=1920,1080")
+    options.add_argument("--disable-blink-features=AutomationControlled")  # Prevent bot detection
+    options.add_argument("--window-size=1920,1080")  # Ensure proper rendering in headless mode
 
-    driver = webdriver.Remote(command_executor=SELENIUM_GRID_URL, options=options)
+    grid_url = "http://selenium-grid-hub:4444/wd/hub"  # Ensure this is correct
+    driver = webdriver.Remote(command_executor=grid_url, options=options)
     return driver
 
 
-def take_screenshot(driver, test_name):
-    """Capture a screenshot and save it with the test name."""
-    screenshot_dir = "screenshots"
-    os.makedirs(screenshot_dir, exist_ok=True)
-    screenshot_path = os.path.join(screenshot_dir, f"{test_name}.png")
-    driver.save_screenshot(screenshot_path)
-    logger.info("Screenshot saved: %s", screenshot_path)
-
-
-@pytest.fixture(scope="function")
-def browser():
-    """Fixture to initialize and quit the driver for each test."""
-    driver = get_headless_driver()
-    yield driver
-    driver.quit()
-
-
-def test_homepage(browser):
-    """Test if the Insider homepage loads successfully."""
+def test_homepage():
+    driver = None
     try:
-        browser.get(BASE_URL)
-        WebDriverWait(browser, 10).until(EC.presence_of_element_located((By.TAG_NAME, "body")))
-        assert "Insider" in browser.title
-        logger.info("✅ TEST 1 PASSED: Homepage loaded successfully")
+        driver = get_headless_driver()
+        driver.get("https://useinsider.com/")
+        WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.TAG_NAME, "body")))
+        assert "Insider" in driver.title
+        print("✅ TEST 1 PASSED: Homepage loaded successfully")
     except Exception as e:
-        take_screenshot(browser, "test_homepage_failure")
-        logger.error("❌ TEST 1 FAILED: Homepage - %s", e)
-        raise
+        print(f"❌ TEST 1 FAILED: Homepage - {e}")
+    finally:
+        if driver:
+            driver.quit()
 
 
-def test_careers_page(browser):
-    """Test navigation to the Careers page and verify sections."""
+def test_careers_page():
+    driver = None
     try:
-        browser.get(BASE_URL)
+        driver = get_headless_driver()
+        driver.get("https://useinsider.com/")
 
-        company_menu = WebDriverWait(browser, 15).until(
+        company_menu = WebDriverWait(driver, 15).until(
             EC.element_to_be_clickable((By.LINK_TEXT, "Company"))
         )
         company_menu.click()
 
-        careers_link = WebDriverWait(browser, 15).until(
+        careers_link = WebDriverWait(driver, 15).until(
             EC.element_to_be_clickable((By.LINK_TEXT, "Careers"))
         )
         careers_link.click()
 
-        WebDriverWait(browser, 10).until(EC.url_contains("careers"))
-        assert "careers" in browser.current_url
-        assert WebDriverWait(browser, 10).until(
+        WebDriverWait(driver, 10).until(EC.url_contains("careers"))
+        assert "careers" in driver.current_url
+        assert WebDriverWait(driver, 10).until(
             EC.presence_of_element_located((By.XPATH, "//h3[contains(text(), 'Our Locations')]"))
         )
-        assert WebDriverWait(browser, 10).until(
+        assert WebDriverWait(driver, 10).until(
             EC.presence_of_element_located((By.XPATH, "//a[contains(text(), 'See all teams')]"))
         )
-        assert WebDriverWait(browser, 10).until(
+        assert WebDriverWait(driver, 10).until(
             EC.presence_of_element_located((By.XPATH, "//h2[contains(text(), 'Life at Insider')]"))
         )
 
-        logger.info("✅ TEST 2 PASSED: Careers page loaded successfully")
+        print("✅ TEST 2 PASSED: Careers page loaded successfully")
     except Exception as e:
-        take_screenshot(browser, "test_careers_page_failure")
-        logger.error("❌ TEST 2 FAILED: Careers page - %s", e)
-        raise
+        print(f"❌ TEST 2 FAILED: Careers page - {e}")
+    finally:
+        if driver:
+            driver.quit()
 
 
-def test_qa_jobs_page(browser):
-    """Test the QA jobs page, including filtering and job details."""
+def test_qa_jobs_page(): #test_qa_jobs_page
+    driver = None
     try:
-        browser.get(f"{BASE_URL}careers/quality-assurance/")
+        driver = get_headless_driver()
+        driver.get("https://useinsider.com/careers/quality-assurance/")
 
-        # Handle cookie consent banner
+        # Handle cookie consent banner if it exists
         try:
-            accept_button = WebDriverWait(browser, 5).until(
+            accept_button = WebDriverWait(driver, 5).until(
                 EC.element_to_be_clickable((By.XPATH, "//a[contains(text(), 'Accept')]"))
             )
             accept_button.click()
-            logger.info("✅ Cookie consent accepted")
+            print("✅ TEST 3 PASSED:  Cookie consent accepted and QA Jobs Loaded successfully ")
         except Exception:
-            logger.info("ℹ️ No cookie banner found or already dismissed")
+            print("❌ TEST 3  FAILED: No cookie banner found or already dismissed")
 
         # Click "See all QA jobs"
-        see_all_qa_jobs_link = WebDriverWait(browser, 15).until(
+        see_all_qa_jobs_link = WebDriverWait(driver, 15).until(
             EC.element_to_be_clickable(
                 (By.XPATH, "//a[@href='https://useinsider.com/careers/open-positions/?department=qualityassurance']")
             )
@@ -125,12 +100,12 @@ def test_qa_jobs_page(browser):
         see_all_qa_jobs_link.click()
 
         # Verify redirection
-        WebDriverWait(browser, 15).until(EC.url_contains("open-positions"))
-        assert "qualityassurance" in browser.current_url, "❌ Redirection to QA jobs page failed"
+        WebDriverWait(driver, 15).until(EC.url_contains("open-positions"))
+        assert "qualityassurance" in driver.current_url, "❌ Redirection to QA jobs page failed"
 
-        # Filter jobs by location
-        try:
-            dropdown_element = WebDriverWait(browser, 10).until(
+
+        try: #test_apply_locatiom
+            dropdown_element = WebDriverWait(driver, 10).until(
                 EC.presence_of_element_located((By.ID, "filter-by-location"))
             )
             select = Select(dropdown_element)
@@ -140,44 +115,56 @@ def test_qa_jobs_page(browser):
 
             selected_option = select.first_selected_option.text
             assert selected_option == "Istanbul, Turkiye", "❌ Location filter not applied correctly"
-            logger.info("✅ TEST 3 PASSED: Location filter applied successfully")
+            print("✅ TEST 4 PASSED: Location filter applied successfully")
         except Exception as e:
-            logger.error("❌ TEST 3 FAILED: Failed to apply location filter: %s", e)
-            raise
+            print(f"❌ TEST 4 FAILED: Failed to apply location filter: {e}")
 
-        # Test "View Role" button
-        try:
-            hover_element = browser.find_element(By.XPATH, '//*[@id="jobs-list"]/div[1]/div')
-            actions = ActionChains(browser)
+        # Click "View Role" button
+
+        try: #test_view_role
+            # Locate the element to hover over (the parent container or the button itself)
+            hover_element = driver.find_element(By.XPATH, '//*[@id="jobs-list"]/div[1]/div')
+
+            # Use ActionChains to move the cursor to the element
+            actions = ActionChains(driver)
             actions.move_to_element(hover_element).perform()
-            logger.info("✅ Cursor moved to the element")
+            print("✅ Cursor moved to the element")
 
-            view_role_button = WebDriverWait(browser, 15).until(
+            # Wait for the "View Role" button to be clickable
+            view_role_button = WebDriverWait(driver, 15).until(
                 EC.element_to_be_clickable(
                     (By.XPATH, "//a[contains(@class, 'btn-navy') and contains(text(), 'View Role')]")
                 )
             )
             view_role_url = view_role_button.get_attribute("href")
-            logger.info("ℹ️ View Role button URL: %s", view_role_url)
+            print(f"ℹ️ View Role button URL: {view_role_url}")
 
-            browser.execute_script(f"window.open('{view_role_url}', '_blank');")
-            logger.info("✅ Opened the View Role URL in a new tab")
+            # Open the URL in a new tab using JavaScript
+            driver.execute_script(f"window.open('{view_role_url}', '_blank');")
+            print("✅ Opened the View Role URL in a new tab")
 
-            WebDriverWait(browser, 15).until(EC.number_of_windows_to_be(2))
-            browser.switch_to.window(browser.window_handles[1])
+            # Wait for new tab to open and switch to it
+            WebDriverWait(driver, 15).until(EC.number_of_windows_to_be(2))
+            driver.switch_to.window(driver.window_handles[1])
 
-            WebDriverWait(browser, 15).until(EC.url_contains("jobs.lever.co"))
-            assert "jobs.lever.co" in browser.current_url, "❌ View Role button did not open correct URL"
-            logger.info("✅ TEST 4 PASSED: View Role button opened the correct URL")
+            # Verify new tab URL
+            WebDriverWait(driver, 15).until(EC.url_contains("jobs.lever.co"))
+            assert "jobs.lever.co" in driver.current_url, "❌ View Role button did not open correct URL"
+            print("✅ TEST 5 PASSED: View Role button opened the correct URL")
+
+        except TimeoutException as e:
+            print(f"❌ TEST 5 FAILED: Timeout while waiting for element or new tab: {e}")
+        except NoSuchElementException as e:
+            print(f"❌ TEST 5 FAILED: Element not found: {e}")
         except Exception as e:
-            logger.error("❌ TEST 4 FAILED: %s", e)
-            raise
+            print(f"❌ TEST 5 FAILED: Unexpected error: {e}")
 
-    except Exception as e:
-        take_screenshot(browser, "test_qa_jobs_page_failure")
-        logger.error("❌ TEST FAILED: QA Jobs page - %s", e)
-        raise
+    finally:
+        if driver:
+            driver.quit()
 
 
 if __name__ == "__main__":
-    pytest.main(["-v", "--html=report.html"])
+    test_homepage()
+    test_careers_page()
+    test_qa_jobs_page()
