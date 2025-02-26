@@ -18,7 +18,7 @@ def setup_browser():
     chrome_options.add_argument("--disable-dev-shm-usage")  # Avoid memory issues
     chrome_options.add_argument("--window-size=1920,1080")  # Set window size for proper rendering
 
-    hub_url = "http://selenium-hub:4444/wd/hub"  # Selenium Grid URL
+    hub_url = "http://selenium-grid-hub:4444/wd/hub"  # Selenium Grid URL
     browser = webdriver.Remote(command_executor=hub_url, options=chrome_options)
     return browser
 
