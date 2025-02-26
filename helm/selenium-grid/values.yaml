@@ -8,9 +8,9 @@ hub:
     tag: 4.28.1
     pullPolicy: Always
   env:
-    - SE_GRID_TIMEOUT: 
+    - name: SE_GRID_TIMEOUT: 
       value: "300000"
-    - SE_SESSION_REQUEST_TIMEOUT: 
+    - name: SE_SESSION_REQUEST_TIMEOUT: 
       value: "300000"
   resources:
     requests:
@@ -27,11 +27,11 @@ chromeNode:
     tag: 4.28.1
     pullPolicy: Always
   env:
-    - SE_EVENT_BUS_HOST: 
+    - name: SE_EVENT_BUS_HOST: 
       value: "selenium-hub"
-    - SE_EVENT_BUS_PUBLISH_PORT: 
+    - name: SE_EVENT_BUS_PUBLISH_PORT: 
       value: "4442"
-    - SE_EVENT_BUS_SUBSCRIBE_PORT: 
+    - name: SE_EVENT_BUS_SUBSCRIBE_PORT: 
       value: "4443"
   resources:
     requests:

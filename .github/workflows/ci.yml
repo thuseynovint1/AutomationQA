@@ -124,9 +124,11 @@ jobs:
           aws eks update-kubeconfig --region ${{ env.REGION }} --name ${{ env.CLUSTER_NAME }}
 
       # Verify Helm chart
-      - name: Verify Helm chart
+      - name: Verify Helm chart and Render
         run: |
           helm lint ./helm/selenium-grid -f ./helm/selenium-grid/values.yaml
+          helm template selenium-grid ./helm/selenium-grid -f ./helm/selenium-grid/values.yaml
+
 
       # Install Helm chart
       - name: Install Helm chart
