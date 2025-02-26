@@ -70,36 +70,3 @@ spec:
               cpu: 250m
               memory: 256Mi
 
----
-
-# # Automation Tests Deployment
-# apiVersion: apps/v1
-# kind: Deployment
-# metadata:
-#   name: {{ include "selenium-grid.fullname" . }}-automation
-#   labels:
-#     {{- include "selenium-grid.labels" . | nindent 4 }}
-# spec:
-#   replicas: {{ .Values.replicas }}
-#   selector:
-#     matchLabels:
-#       {{- include "selenium-grid.selectorLabels" . | nindent 6 }}
-#       app: selenium-automation
-#   template:
-#     metadata:
-#       labels:
-#         {{- include "selenium-grid.selectorLabels" . | nindent 8 }}
-#         app: selenium-automation
-#     spec:
-#       containers:
-#         - name: selenium-app
-#           image: "{{ .Values.automation.image.repository }}:{{ .Values.automation.image.tag }}"
-#           imagePullPolicy: {{ .Values.automation.image.pullPolicy }}
-#           resources:
-#             {{- toYaml .Values.automation.resources | nindent 12 }}
-#           volumeMounts:
-#             - name: test-results
-#               mountPath: {{ .Values.automation.volume.mountPath }}
-#       volumes:
-#         - name: test-results
-#           emptyDir: {}
