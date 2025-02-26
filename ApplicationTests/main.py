@@ -94,9 +94,9 @@ def validate_qa_jobs():
         try:
             location_filter = WebDriverWait(browser, 10).until(EC.presence_of_element_located((By.ID, "filter-by-location")))
             select_location = Select(location_filter)
-            time.sleep(3)  # Wait for dropdown options to load
+            time.sleep(6)  # Wait for dropdown options to load
             select_location.select_by_index(1)  # Select the second option (e.g., Istanbul, Turkiye)
-            time.sleep(2)
+            time.sleep(6)
 
             selected_location = select_location.first_selected_option.text
             assert selected_location == "Istanbul, Turkiye", "❌ Location filter not applied correctly"
