@@ -12,6 +12,9 @@ permissions:
 env:
   REGION: eu-north-1
   TAG_TEST: qa-tests-${{ github.sha }}
+  TAG_SEL_HUB: sellenium-grid-hub-${{ github.sha }}
+  TAG_CHROME_NODE: chrome-node-${{ github.sha }}
+
   REPO: 727646471145.dkr.ecr.eu-north-1.amazonaws.com/hteymur/qa-automation
 
 jobs:
@@ -57,6 +60,8 @@ jobs:
     - name: Build docker image
       run: |
         docker build -t $REPO:$TAG_TEST -f DockerFiles/DockerfileTest .
+        docker build -t $REPO:$TAG_SEL_HUB -f DockerFiles/DockerfileSelHub .
+        docker build -t $REPO:$TAG_CHROME_NODE -f DockerFiles/DockerfileChromeNode .
     
     # Get AWS creds
     - name: Configure AWS credentials
@@ -75,4 +80,6 @@ jobs:
     - name: Publish docker image
       run: |
         docker push $REPO:$TAG_TEST
+        docker push $REPO:$TAG_SEL_HUB
+        docker push $REPO:$TAG_CHROME_NODE
 
