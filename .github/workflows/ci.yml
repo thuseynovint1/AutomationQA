@@ -15,7 +15,7 @@ env:
   TAG_SEL_HUB: selenium-grid-hub-${{ github.sha }}
   TAG_CHROME_NODE: chrome-node-${{ github.sha }}
   REPO: 727646471145.dkr.ecr.eu-north-1.amazonaws.com/hteymur/qa-automation
-  CLUSTER_NAME: QaAutomationEKS 
+  CLUSTER_NAME: eks-test-demo
   HELM_CHART_DIR: helm/selenium-grid 
 
 jobs:
