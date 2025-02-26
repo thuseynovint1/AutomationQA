@@ -72,6 +72,7 @@ def test_careers_page(browser):
     try:
         browser.get(BASE_URL)
 
+        # Navigate to the "Company" menu and click "Careers"
         company_menu = WebDriverWait(browser, 15).until(
             EC.element_to_be_clickable((By.LINK_TEXT, "Company"))
         )
@@ -82,6 +83,7 @@ def test_careers_page(browser):
         )
         careers_link.click()
 
+        # Verify Careers page content
         WebDriverWait(browser, 10).until(EC.url_contains("careers"))
         assert "careers" in browser.current_url
         assert WebDriverWait(browser, 10).until(
@@ -124,7 +126,7 @@ def test_qa_jobs_page(browser):
         )
         see_all_qa_jobs_link.click()
 
-        # Verify redirection
+        # Verify redirection to QA jobs page
         WebDriverWait(browser, 15).until(EC.url_contains("open-positions"))
         assert "qualityassurance" in browser.current_url, "❌ Redirection to QA jobs page failed"
 
@@ -135,11 +137,13 @@ def test_qa_jobs_page(browser):
             )
             select = Select(dropdown_element)
             time.sleep(3)  # Allow dropdown options to load
-            select.select_by_index(1)  # Select the second option
+
+            # Change the location to "London, United Kingdom"
+            select.select_by_visible_text("London, United Kingdom")
             time.sleep(2)
 
             selected_option = select.first_selected_option.text
-            assert selected_option == "Istanbul, Turkiye", "❌ Location filter not applied correctly"
+            assert selected_option == "London, United Kingdom", "❌ Location filter not applied correctly"
             logger.info("✅ TEST 3 PASSED: Location filter applied successfully")
         except Exception as e:
             logger.error("❌ TEST 3 FAILED: Failed to apply location filter: %s", e)
@@ -178,10 +182,6 @@ def test_qa_jobs_page(browser):
         logger.error("❌ TEST FAILED: QA Jobs page - %s", e)
         raise
 
+
 if __name__ == "__main__":
-    test_homepage()
-    test_careers_page()
-    test_qa_jobs_page()
-    
-if __name__ == "__main__":
-    pytest.main(["-v", "--html=report.html"])
+    pytest.main(["-v"])
