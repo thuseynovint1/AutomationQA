@@ -11,6 +11,7 @@ spec:
         {{- include "selenium-grid.selectorLabels" . | nindent 8 }}
         app: selenium-automation
     spec:
+      ttlSecondsAfterFinished: 180
       containers:
         - name: selenium-app
           image: "{{ .Values.automation.image.repository }}:{{ .Values.automation.image.tag }}"
