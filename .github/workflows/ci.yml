@@ -45,5 +45,5 @@ jobs:
     # Publish docker image 
     - name: Publish docker image
       run: |
-        docker build $REPO:$TAG_TEST
+        docker push $REPO:$TAG_TEST
 
