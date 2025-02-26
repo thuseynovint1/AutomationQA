@@ -126,6 +126,8 @@ jobs:
       # Verify Helm chart
       - name: Verify Helm chart
         run: |
+          ls -la ./helm
+          ls -la ./helm/selenium-grid
           helm lint ./helm/selenium-grid -f ./helm/selenium-grid/Values.yaml
 
       # Install Helm chart
