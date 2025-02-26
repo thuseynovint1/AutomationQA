@@ -14,11 +14,11 @@ hub:
       value: "300000"
   resources:
     requests:
-      cpu: "500m"
-      memory: "512Mi"
+      cpu: "250m"
+      memory: "256Mi"
     limits:
       cpu: "1000m"
-      memory: "1024Mi"
+      memory: "512Mi"
 
 # Chrome Node configuration
 chromeNode:
@@ -39,7 +39,7 @@ chromeNode:
       memory: "512Mi"
     limits:
       cpu: "1000m"
-      memory: "1024Mi"
+      memory: "256Mi"
   autoscaler:
     enabled: true
     minReplicas: "1"
@@ -56,9 +56,9 @@ automation:
   resources:
     requests:
       cpu: "250m"
-      memory: "512Mi"
+      memory: "256Mi"
     limits:
       cpu: "500m"
-      memory: "1Gi"
+      memory: "512Mi"
   volume:
     mountPath: /app/results
