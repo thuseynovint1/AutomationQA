@@ -65,7 +65,7 @@ This project automates end-to-end testing for the [Insider](https://useinsider.c
 
 ### System Flow Diagram
 
-```plaintext
+
 +-------------------+       +-------------------+       +-------------------+
 |                   |       |                   |       |                   |
 |    Job Pod        | ----> |  Selenium Hub     | ----> |  Chrome Node Pod  |
@@ -73,6 +73,18 @@ This project automates end-to-end testing for the [Insider](https://useinsider.c
 |                   |       |                   |       |                   |
 +-------------------+       +-------------------+       +-------------------+
 
+
+### Expected Output
+
+1.This project does XYZ. Below is a representation of the architecture:
+
+![CiCd Pipline](images/pipline.png)
+
+![QA team Test output](images/test-output.png)
+
+![AWS EKS](images/awsEKS.png)
+
+![Container Registry](images/awsECS.png)
 
 
 
