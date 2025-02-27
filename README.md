@@ -53,9 +53,13 @@ The CI/CD pipeline is configured using GitHub Actions and includes the following
    - Configures AWS credentials and updates the kubeconfig for the EKS cluster.
    - Verifies and deploys the Helm chart for the Selenium Grid.
 ---
-# QA Automation Project with Selenium Grid on EKS
+### QA Automation Project with Selenium Grid on EKS
 
-This project automates end-to-end testing for the [Insider](https://useinsider.com/) website using **Selenium Grid** deployed on **Amazon EKS**. The tests are executed in a distributed manner, where a **Job Pod** sends test requests to the **Selenium Hub**, which delegates the tasks to a **Chrome Node Pod** for execution. The entire system is deployed using a **Helm chart**.
+This project automates end-to-end testing for the [Insider](https://useinsider.com/) website using **Selenium Grid** deployed on **Amazon EKS**. 
+The tests are executed in a distributed manner, where a **Job Pod** sends test requests to the **Selenium Hub**, which delegates the tasks to a **Chrome Node Pod** for execution. 
+The entire system is deployed using a **Helm chart**.
+
+
 ---
 ## 🚀 How It Works
 
@@ -65,18 +69,16 @@ This project automates end-to-end testing for the [Insider](https://useinsider.c
 
 ### System Flow Diagram
 
-
+```plaintext
 +-------------------+       +-------------------+       +-------------------+
 |                   |       |                   |       |                   |
 |    Job Pod        | ----> |  Selenium Hub     | ----> |  Chrome Node Pod  |
 |(python code pod)  |       |  (Controller)     |       |  (Executes Tests) |
 |                   |       |                   |       |                   |
 +-------------------+       +-------------------+       +-------------------+
-
-
-### Expected Output
-
-1.This project does XYZ. Below is a representation of the architecture:
+```
+---
+# Expected Output
 
 ![CiCd Pipline](images/pipline.png)
 
@@ -85,7 +87,7 @@ This project automates end-to-end testing for the [Insider](https://useinsider.c
 ![AWS EKS](images/awsEKS.png)
 
 ![Container Registry](images/awsECS.png)
-
+=
 
 
 
